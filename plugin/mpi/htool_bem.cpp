@@ -4,6 +4,7 @@
 #define _USE_MATH_DEFINES
 #include <ff++.hpp>
 #include <AFunction_ext.hpp>
+#include <lgfem.hpp>
 
 #include <htool/lrmat/partialACA.hpp>
 #include <htool/lrmat/fullACA.hpp>
@@ -705,8 +706,8 @@ struct OpCall_BemKFormBilinear_np {
     static const int n_name_param =1+NB_NAME_PARM_MAT; // 9-> 11 FH 31/10/2005  11->12 nbiter 02/2007  // 12->22 MUMPS+ Autre Solveur 02/08
 };
 
-basicAC_F0::name_and_type OpCall_FormBilinear_np::name_param[] = {
-    {"bmat", &typeid(Matrice_Creuse< R > *)}, LIST_NAME_PARM_MAT};
+basicAC_F0::name_and_type OpCall_BemKFormBilinear_np::name_param[] = {
+    {"bmat", &typeid(HMatrixVirt< R > *)}, LIST_NAME_PARM_MAT};
 
 
 
@@ -727,10 +728,26 @@ OpCall_BemKFormBilinear_np
     OneOperator(atype<const Call_BemKFormBilinear<v_fes>*>(),atype<const T *>(),atype<pfes*>(),atype<pfes*>()) {}
 };
 
+
+template<class VFES>
+Call_BemKFormBilinear<VFES>::Call_BemKFormBilinear(int dd,Expression * na,Expression  BB,Expression fi, Expression fj)
+: d(dd),nargs(na),largs(),N(fi->nbitem()),M(fj->nbitem()),
+euh(fi), evh(fj)
+{
+    assert(nargs );
+    const C_args * LLL=dynamic_cast<const C_args *>(BB);
+    if (!LLL)
+        CompileError("Sorry the BEM variationnal form (varf)  is not a the variationnal form (type const C_args *)");
+    largs=LLL->largs;
+}
+
+
 //
 
 static void Init_Schwarz() {
 	Dcl_Type<std::map<std::string, std::string>*>( );
+    
+    
 	TheOperators->Add("<<",new OneBinaryOperator<PrintPinfos<std::map<std::string, std::string>*>>);
 	Add<std::map<std::string, std::string>*>("[","",new OneOperator2_<string*, std::map<std::string, std::string>*, string*>(get_info));
 
@@ -775,6 +792,11 @@ static void Init_Schwarz() {
     
     
     
+    Dcl_Type< const Call_BemKFormBilinear< v_fesS > * >( );    // to set HMatrix 3D surface
+    Dcl_Type< const Call_BemKFormBilinear< v_fesL > * >( );    // to set HMatrix 3D curve
+    aType t_C_args = map_type[typeid(const C_args *).name( )] = new TypeFormOperator;
+    
+    atype< const C_args * >( )->AddCast(new OneOperatorCode< C_args >(t_C_args, atype<HMatrixVirt<std::complex<double> > **>() ) );
     
     
     

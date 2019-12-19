@@ -83,69 +83,6 @@ AnyType operator()(Stack )  const {
  
  };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//typedef   BemOpertor(BemKernel,Finconnue,Ftest) BemFoperator;
-/*class BemKOperator : public E_F0mps { public:
-    
-    Finconnue *fu;
-    BemKernel *fk;
-    Ftest *fv;
- 
-    BemKOperator(): fu(0),fk(0),fv(0) {}
-    
-    BemKOperator(BemKernel *ffk, Finconnue *ffu, Ftest *ffv): fu(ffu),fk(ffk),fv(ffv) {}
-    //BemOperator(const BemKernel *ffk, const Finconnue *ffu, const Ftest *ffv): fu(ffu),fk(ffk),fv(ffv) {}
-    
-    BemKOperator(const BemKOperator &beml): fu(beml.fu),fk(beml.fk),fv(beml.fv) {}
-    
-   
-    void operator=(const BemKOperator &beml) {
-        fu=beml.fu;
-        fk=beml.fk;
-        fv=beml.fv;
-    }
-        
-        
-    BemKOperator & operator *= (Finconnue * ff)
-    { ffassert(fu==0);
-        fu=ff;
-        return *this;
-    }
-    BemKOperator & operator *= (Ftest * ff)
-    { ffassert(fv==0);
-        fv=ff;
-        return *this;
-    }
-    BemKOperator & operator *= (BemKernel * ff)
-    { ffassert(fk==0);
-        fk=ff;
-        return *this;
-    }
-  
-    
-    
-    
-    AnyType operator()(Stack )  const {
-        return SetAny<const BemKOperator * >(this);}
-    
-    operator aType () const { return atype<const BemKOperator >();}
-    
-    
-};*/
-
 inline int intOp(const MGauche &i) {return i.second;}
 inline int intOp(const MDroit &i) {return i.second;}
 inline int intOp(pair<MGauche,MDroit> & p) {return Max(intOp(p.first),intOp(p.second));}
@@ -228,44 +165,9 @@ class C_args: public E_F0mps  {public:
   bool Zero()  const { return largs.empty();} // BIG WARNING April and wrong functon FH v 3.60 .......
   bool IsLinearOperator() const;
   bool IsBilinearOperator() const;
-};
-
-/*
-class BemC_args: public E_F0mps  {public:
-    typedef const BemC_args *  Result;
-    list<C_F0> largs;
-    typedef list<C_F0> ::const_iterator const_iterator ;
-    // il faut expendre
-    BemC_args() :largs(){}
-    BemC_args(C_F0 c) : largs() { if(!c.Zero() )largs.push_back(c);}
-    BemC_args(  const basicAC_F0 & args) :largs(){
-        int n=args.size();
-        for (int i=0;i< n;i++)
-        {
-            if(args[i].Zero()) ; //  skip zero term ...
-            else  if (args[i].left() == atype<const BemC_args *>())
-            {
-                const BemC_args * a = dynamic_cast<const BemC_args *>(args[i].LeftValue());
-                if (a == NULL) printf("dynamic_cast error\n");
-                for (list<C_F0>::const_iterator i=a->largs.begin();i!=a->largs.end();i++)
-                    if( ! i->Zero()) // skip Zero term
-                        largs.push_back(*i);
-            }
-            else
-                largs.push_back(args[i]);
-        };}
-    static ArrayOfaType  typeargs() { return ArrayOfaType(true);}
-    AnyType operator()(Stack ) const  { return SetAny<const BemC_args *>(this);}
-    operator aType () const { return atype<const BemC_args *>();}
+  bool IsBemOperator() const;
     
-    static  E_F0 * f(const basicAC_F0 & args) { return new BemC_args(args);}
-    bool Zero()  const { return largs.empty();} // BIG WARNING April and wrong functon FH v 3.60 .......
-    bool IsBemBilinearOperator() const;
 };
-
-*/
-
-
 
 class C_args_minus: public C_args  {public:
   C_args_minus(  const basicAC_F0 & args) {
@@ -1076,7 +978,7 @@ struct OpCall_FormBilinear
   E_F0 * code(const basicAC_F0 & args) const
   { Expression * nargs = new Expression[n_name_param];
     args.SetNameParam(n_name_param,name_param,nargs);
-    // cout << " OpCall_FormBilinear " << *args[0].left() << " " << args[0].LeftValue() << endl;
+     cout << " OpCall_FormBilinear " << *args[0].left() << " " << args[0].LeftValue() << endl;
     return  new Call_FormBilinear<v_fes>(v_fes::dHat,nargs,to<const C_args*>(args[0]),to<pfes*>(args[1]),to<pfes*>(args[2]));}
   OpCall_FormBilinear() :
     OneOperator(atype<const Call_FormBilinear<v_fes>*>(),atype<const T *>(),atype<pfes*>(),atype<pfes*>()) {}
@@ -1244,12 +1146,12 @@ public:
     
 };
 
-/*class BemPTypeFormBilinear: public ForEachType<const BemPFormBilinear*> {
+
+class TypeBemKFormOperator: public ForEachType<const C_args*> {
 public:
-    BemPTypeFormBilinear() : ForEachType<const BemPFormBilinear*>(0,0,0) {}
+    TypeBemKFormOperator() : ForEachType<const C_args*>(0,0,0) {}
     void SetArgs(const ListOfId *lid) const {
-        SetArgsBemPFormLinear(lid,3);
-    }
+        SetArgsBemKFormLinear(lid,3);    }
     
     Type_Expr SetParam(const C_F0 & c,const ListOfId *l,size_t & top) const
     { return Type_Expr(this,CastTo(c));}
@@ -1262,24 +1164,7 @@ public:
     {
         return e; }
     
-};*/
-
-class TypeBemKFormOperator: public ForEachType<const C_args*> {
-public:
-    TypeBemKFormOperator() : ForEachType<const C_args*>(0,0,0) {}
-    void SetArgs(const ListOfId *lid) const {
-        SetArgsBemKFormLinear(lid,3);    }
-    
-    Type_Expr SetParam(const C_F0 & c,const ListOfId *l,size_t & top) const
-    { return Type_Expr(this,CastTo(c));}
-    
-    inline  C_F0 Initialization(const Type_Expr & e) const {return C_F0();}
-    
 };
-
-
-
-
 
 
 

@@ -9562,6 +9562,20 @@ bool C_args::IsBilinearOperator() const {
     }
     return true;}
 
+bool C_args::IsBemOperator() const {
+    //  int n=largs.size();
+    aType tRn =atype<KN<R>* >();
+    aType tCn =atype<KN<Complex>* >();
+    for (const_iterator i=largs.begin(); i != largs.end();i++)
+    {
+        C_F0  c= *i;
+        // Expression e=c;
+        aType r=c.left();
+        if (     ( r != atype<const  BemKFormBilinear *>() )
+            
+            ) return false;
+    }
+    return true;}
 
 void SetArgsFormLinear(const ListOfId *lid,int ordre)
 {
@@ -9699,7 +9713,7 @@ void SetArgsBemKFormLinear(const ListOfId *lid,int ordre)
 }
 
 
-void SetArgsBemPFormLinear(const ListOfId *lid,int ordre)
+/*void SetArgsBemPFormLinear(const ListOfId *lid,int ordre)
 {
     //  the local parameter are
     //  ordre ==2 => bilinear form  unknown (newU_) and test function (newV_)
@@ -9759,13 +9773,13 @@ void SetArgsBemPFormLinear(const ListOfId *lid,int ordre)
          currentblock->NewID(vh,l[i].id,C_F0(newV_(j%nn),vh));
          j++;
          }*/
-    }
+   /* }
     else
     {
         CompileError(" Sorry you mixte formulation with and without array ");
     }
 }
-
+*/
 
 
 const Fem2D::GQuadratureFormular<R3> & CDomainOfIntegration::FIV(Stack stack) const
